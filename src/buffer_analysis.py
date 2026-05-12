@@ -5,7 +5,7 @@ Buffer analysis: coverage zones around healthcare facilities.
 import geopandas as gpd
 
 # UTM zone 37N — metric CRS for Istanbul
-_UTM_CRS = "EPSG:32637"
+_UTM_CRS = "EPSG:32636"  # UTM Zone 36N — correct for Istanbul
 
 
 def create_buffers(facilities_gdf, distances_km=None):

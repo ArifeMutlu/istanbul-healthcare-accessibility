@@ -25,22 +25,21 @@ def buffer_analysis(facilities, buffer_distances_km=[2, 5, 10]):
     Returns: GeoDataFrame with buffer polygons
     """
     # Project to UTM Zone 35N (Istanbul)
-    facilities_proj = facilities.to_crs("EPSG:32635")
-    
+    facilities_proj = facilities.to_crs("EPSG:32636")
+
     buffers = {}
     for dist_km in buffer_distances_km:
         dist_m = dist_km * 1000
         buffer_gdf = facilities_proj.copy()
         buffer_gdf["geometry"] = facilities_proj.geometry.buffer(dist_m)
         buffer_gdf["buffer_km"] = dist_km
-        
-        # Dissolve to get union of all buffers
+
         dissolved = buffer_gdf.dissolve()
         dissolved = dissolved.to_crs("EPSG:4326")
-        
+
         buffers[dist_km] = dissolved
-        
-        area_km2 = dissolved.to_crs("EPSG:32635").geometry.area.sum() / 1e6
+
+        area_km2 = dissolved.to_crs("EPSG:32636").geometry.area.sum() / 1e6
         print(f"Buffer {dist_km}km: covers {area_km2:.1f} km²")
     
     return buffers
@@ -58,8 +57,8 @@ def nearest_facility_analysis(points_gdf, facilities):
         GeoDataFrame with nearest facility distance added
     """
     # Project to UTM for accurate distance calculation
-    points_proj = points_gdf.to_crs("EPSG:32635")
-    facilities_proj = facilities.to_crs("EPSG:32635")
+    points_proj = points_gdf.to_crs("EPSG:32636")
+    facilities_proj = facilities.to_crs("EPSG:32636")
     
     from shapely.ops import nearest_points
     
@@ -77,7 +76,7 @@ def nearest_facility_analysis(points_gdf, facilities):
             "nearest_distance_km": distance_m / 1000,
         })
     
-    result_gdf = gpd.GeoDataFrame(results, crs="EPSG:32635")
+    result_gdf = gpd.GeoDataFrame(results, crs="EPSG:32636")
     
     # Merge with original data
     points_gdf = points_gdf.copy()
@@ -93,8 +92,8 @@ def calculate_accessibility_score(districts, facilities):
     
     Higher score = better accessibility
     """
-    districts_proj = districts.to_crs("EPSG:32635")
-    facilities_proj = facilities.to_crs("EPSG:32635")
+    districts_proj = districts.to_crs("EPSG:32636")
+    facilities_proj = facilities.to_crs("EPSG:32636")
     
     # Count facilities per district
     joined = gpd.sjoin(facilities_proj, districts_proj, how="left", predicate="within")

@@ -6,7 +6,7 @@ from load_data import load_facilities, make_geodataframe
 from shapely.geometry import Point
 
 # UTM zone 37N — accurate metric distances for Istanbul
-_UTM_CRS = "EPSG:32637"
+_UTM_CRS = "EPSG:32636"  # UTM Zone 36N — correct for Istanbul
 
 
 def find_nearest(location, gdf, k=1):

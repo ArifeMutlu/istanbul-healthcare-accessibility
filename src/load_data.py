@@ -1,6 +1,7 @@
 """
 Load and process healthcare facility data.
 """
+import os
 import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
@@ -61,6 +62,28 @@ def load_istanbul_districts():
     )
     
     return gdf
+
+def load_osm_facilities(cache_path=None):
+    """
+    Load real Istanbul healthcare facilities from OSM (cached locally after first fetch).
+    Returns a GeoDataFrame with facility_type, sector, addr_district, geometry columns.
+    """
+    import sys
+    sys.path.insert(0, os.path.dirname(__file__))
+    from data_collector import load_or_fetch_facilities
+    return load_or_fetch_facilities(cache_path)
+
+
+def load_osm_districts(cache_path=None):
+    """
+    Load real Istanbul district boundaries from OSM (cached locally after first fetch).
+    Returns a GeoDataFrame with name and geometry columns.
+    """
+    import sys
+    sys.path.insert(0, os.path.dirname(__file__))
+    from data_collector import load_or_fetch_districts
+    return load_or_fetch_districts(cache_path)
+
 
 def load_facilities():
     """Load facilities from CSV file."""

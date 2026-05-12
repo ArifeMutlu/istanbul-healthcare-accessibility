@@ -3,7 +3,6 @@ Visualization module for Istanbul Healthcare Accessibility
 Creates both static (Matplotlib) and interactive (Folium) maps
 """
 
-import geopandas as gpd
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import folium
@@ -172,13 +171,16 @@ def create_accessibility_interactive_map(districts, score_column="accessibility_
 
 
 if __name__ == "__main__":
-    facilities = gpd.read_file("data/istanbul_healthcare_facilities.geojson")
-    print(f"Loaded {len(facilities)} facilities")
-    
-    # Static map
-    plot_facility_distribution(facilities, save_path="outputs/maps/facility_distribution.png")
-    
-    # Interactive map
-    create_interactive_map(facilities, save_path="outputs/maps/interactive_map.html")
-    
+    import sys
+    sys.path.insert(0, os.path.dirname(__file__))
+    from load_data import load_osm_facilities, load_osm_districts
+
+    facilities = load_osm_facilities()
+    districts = load_osm_districts()
+    print(f"Loaded {len(facilities)} facilities, {len(districts)} districts")
+
+    plot_facility_distribution(facilities, districts=districts,
+                               save_path="outputs/maps/facility_distribution.png")
+    create_interactive_map(facilities, districts=districts,
+                           save_path="outputs/maps/interactive_map.html")
     print("Visualization complete!")
