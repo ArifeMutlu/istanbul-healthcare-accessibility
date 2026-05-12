@@ -1,6 +1,31 @@
-name,type,latitude,longitude
-Taksim Hospital,hospital,41.0369,28.9850
-Kadikoy Clinic,clinic,40.9903,29.0260
-Bakirkoy Hospital,hospital,40.9799,28.8719
-Sisli Clinic,clinic,41.0606,28.9875
-Besiktas Hospital,hospital,41.0428,29.0072
+name,type,latitude,longitude,district
+Taksim Hastanesi,hastane,41.0369,28.9850,Beyoğlu
+Kadıköy Sağlık Merkezi,sağlık_merkezi,40.9903,29.0260,Kadıköy
+Bakırköy Devlet Hastanesi,hastane,40.9799,28.8719,Bakırköy
+Şişli Etfal Hastanesi,hastane,41.0606,28.9875,Şişli
+Beşiktaş Sağlık Ocağı,sağlık_ocağı,41.0428,29.0072,Beşiktaş
+Üsküdar Devlet Hastanesi,hastane,41.0221,29.0188,Üsküdar
+Beyoğlu Göz Hastanesi,hastane,41.0341,28.9740,Beyoğlu
+Fatih Devlet Hastanesi,hastane,41.0186,28.9497,Fatih
+Pendik Sağlık Merkezi,sağlık_merkezi,40.8773,29.2322,Pendik
+Maltepe Devlet Hastanesi,hastane,40.9354,29.1302,Maltepe
+Kartal Eğitim Araştırma Hastanesi,hastane,40.9112,29.1893,Kartal
+Ataşehir Sağlık Ocağı,sağlık_ocağı,40.9922,29.1241,Ataşehir
+Ümraniye Devlet Hastanesi,hastane,41.0157,29.1243,Ümraniye
+Bağcılar Sağlık Merkezi,sağlık_merkezi,41.0349,28.8560,Bağcılar
+Gaziosmanpaşa Devlet Hastanesi,hastane,41.0696,28.9141,Gaziosmanpaşa
+Eyüp Sağlık Ocağı,sağlık_ocağı,41.0476,28.9336,Eyüp
+Sarıyer Devlet Hastanesi,hastane,41.1652,29.0004,Sarıyer
+Bayrampaşa Sağlık Merkezi,sağlık_merkezi,41.0447,28.9137,Bayrampaşa
+Sultangazi Sağlık Ocağı,sağlık_ocağı,41.1072,28.8697,Sultangazi
+Esenler Sağlık Merkezi,sağlık_merkezi,41.0438,28.8737,Esenler
+Arnavutköy Devlet Hastanesi,hastane,41.1848,28.7387,Arnavutköy
+Başakşehir Sağlık Merkezi,sağlık_merkezi,41.0862,28.8028,Başakşehir
+Esenyurt Sağlık Ocağı,sağlık_ocağı,41.0340,28.6762,Esenyurt
+Avcılar Devlet Hastanesi,hastane,40.9791,28.7224,Avcılar
+Küçükçekmece Sağlık Merkezi,sağlık_merkezi,40.9982,28.7763,Küçükçekmece
+Bahçelievler Sağlık Ocağı,sağlık_ocağı,41.0003,28.8525,Bahçelievler
+Zeytinburnu Sağlık Merkezi,sağlık_merkezi,40.9963,28.9054,Zeytinburnu
+Güngören Sağlık Ocağı,sağlık_ocağı,41.0157,28.8739,Güngören
+Bostancı Sağlık Merkezi,sağlık_merkezi,40.9648,29.0952,Kadıköy
+Tuzla Devlet Hastanesi,hastane,40.8153,29.2963,Tuzla

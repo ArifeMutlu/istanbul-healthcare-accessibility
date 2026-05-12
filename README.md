@@ -28,7 +28,15 @@ Analyze which neighborhoods in Istanbul have good/poor access to healthcare faci
 
 ## 🚀 Status
 
-🔄 In Progress - Data collection phase
+✅ Core implementation complete:
+- Data loading from CSV + GeoDataFrame conversion
+- 30 sample facilities across Istanbul districts
+- Interactive Folium maps (facility map, buffer map)
+- Nearest facility finder (geodesic distance via UTM projection)
+- Buffer analysis: 2km / 5km / 10km coverage zones
+- Jupyter EDA notebook (`notebooks/01_data_exploration.ipynb`)
+
+🔄 Next: real district boundaries from OSM, actual facility data from Istanbul Municipality
 
 ## 📝 License
 

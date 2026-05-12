@@ -62,6 +62,19 @@ def load_istanbul_districts():
     
     return gdf
 
+def load_facilities():
+    """Load facilities from CSV file."""
+    import os
+    csv_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'sample_facilities.csv')
+    return pd.read_csv(csv_path)
+
+
+def make_geodataframe(df):
+    """Convert a DataFrame with latitude/longitude columns to a GeoDataFrame."""
+    geometry = [Point(xy) for xy in zip(df.longitude, df.latitude)]
+    return gpd.GeoDataFrame(df, geometry=geometry, crs="EPSG:4326")
+
+
 if __name__ == "__main__":
     # Test
     print("Loading facilities...")
