@@ -21,73 +21,37 @@ _DEFAULT_DISTRICTS_PATH = os.path.join(
 
 
 def fetch_healthcare_from_osm():
-    """Fetch healthcare facilities in Istanbul from OpenStreetMap via Overpass API."""
+    """Fetch healthcare facilities in Istanbul from OpenStreetMap via osmnx."""
+    import osmnx as ox
 
-    overpass_url = "http://overpass-api.de/api/interpreter"
+    print("Fetching healthcare facilities from OpenStreetMap (osmnx)...")
 
-    query = """
-    [out:json][timeout:120];
-    area["name"="İstanbul"]["admin_level"="4"]->.istanbul;
-    (
-      node["amenity"="hospital"](area.istanbul);
-      way["amenity"="hospital"](area.istanbul);
-      node["amenity"="clinic"](area.istanbul);
-      way["amenity"="clinic"](area.istanbul);
-      node["amenity"="doctors"](area.istanbul);
-      way["amenity"="doctors"](area.istanbul);
-      node["healthcare"](area.istanbul);
-      way["healthcare"](area.istanbul);
-    );
-    out center;
-    """
+    tags = {
+        "amenity": ["hospital", "clinic", "doctors"],
+        "healthcare": True,
+    }
+    gdf = ox.features_from_place("İstanbul, Turkey", tags=tags)
+    print(f"Found {len(gdf)} records")
 
-    print("Fetching healthcare facilities from OpenStreetMap...")
-    response = requests.get(overpass_url, params={"data": query}, timeout=130)
-
-    if response.status_code != 200:
-        raise Exception(f"Overpass API error: {response.status_code}")
-
-    data = response.json()
-    elements = data.get("elements", [])
-    print(f"Found {len(elements)} healthcare facilities")
-
-    facilities = []
-    for el in elements:
-        lat = el.get("lat") or el.get("center", {}).get("lat")
-        lon = el.get("lon") or el.get("center", {}).get("lon")
-        tags = el.get("tags", {})
-
-        if lat and lon:
-            facilities.append({
-                "osm_id": el["id"],
-                "name": tags.get("name", "Unknown"),
-                "name_en": tags.get("name:en", ""),
-                "amenity": tags.get("amenity", ""),
-                "healthcare": tags.get("healthcare", ""),
-                "operator": tags.get("operator", ""),
-                "operator_type": tags.get("operator:type", ""),
-                "phone": tags.get("phone", ""),
-                "website": tags.get("website", ""),
-                "addr_district": tags.get("addr:district", ""),
-                "latitude": lat,
-                "longitude": lon,
-            })
-
-    df = pd.DataFrame(facilities)
+    # Project to UTM for accurate centroid, then back to WGS84
+    gdf = gdf.copy()
+    centroids = gdf.geometry.to_crs("EPSG:32636").centroid.to_crs("EPSG:4326")
 
     def classify_type(row):
-        if row["amenity"] == "hospital":
+        amenity = str(row.get("amenity", "")).lower()
+        if amenity == "hospital":
             return "Hospital"
-        elif row["amenity"] == "clinic":
+        elif amenity == "clinic":
             return "Clinic"
-        elif row["amenity"] == "doctors":
+        elif amenity == "doctors":
             return "Doctor"
-        elif row["healthcare"]:
-            return row["healthcare"].title()
+        hc = str(row.get("healthcare", ""))
+        if hc and hc != "nan":
+            return hc.title()
         return "Other"
 
     def classify_operator(row):
-        op = (row["operator"] + " " + row["operator_type"]).lower()
+        op = (str(row.get("operator", "")) + " " + str(row.get("operator:type", ""))).lower()
         if any(k in op for k in ["devlet", "public", "sağlık bakanlığı", "government"]):
             return "Public"
         elif any(k in op for k in ["özel", "private"]):
@@ -96,16 +60,29 @@ def fetch_healthcare_from_osm():
             return "University"
         return "Unknown"
 
-    df["facility_type"] = df.apply(classify_type, axis=1)
-    df["sector"] = df.apply(classify_operator, axis=1)
+    def get_col(col):
+        return gdf[col].fillna("") if col in gdf.columns else [""] * len(gdf)
 
-    gdf = gpd.GeoDataFrame(
-        df,
-        geometry=gpd.points_from_xy(df.longitude, df.latitude),
-        crs="EPSG:4326"
+    result = gpd.GeoDataFrame(
+        {
+            "name": get_col("name").replace("", "Unknown"),
+            "name_en": get_col("name:en"),
+            "amenity": get_col("amenity"),
+            "healthcare": get_col("healthcare"),
+            "operator": get_col("operator"),
+            "addr_district": get_col("addr:district"),
+            "phone": get_col("phone"),
+            "website": get_col("website"),
+            "latitude": centroids.y.values,
+            "longitude": centroids.x.values,
+            "facility_type": [classify_type(row) for _, row in gdf.iterrows()],
+            "sector": [classify_operator(row) for _, row in gdf.iterrows()],
+        },
+        geometry=centroids.values,
+        crs="EPSG:4326",
     )
 
-    return gdf
+    return result
 
 
 def fetch_istanbul_districts():
@@ -115,16 +92,21 @@ def fetch_istanbul_districts():
     """
     import osmnx as ox
 
-    print("Fetching Istanbul district boundaries from OSM...")
-    tags = {"boundary": "administrative", "admin_level": "6"}
-    gdf = ox.features_from_place("İstanbul, Turkey", tags=tags)
+    print("Fetching Istanbul district (ilçe) boundaries from OSM...")
+    # Query only admin_level=6 (ilçe in Turkey). Using a single key avoids
+    # osmnx treating multiple keys as OR and returning all admin boundaries.
+    gdf = ox.features_from_place("İstanbul, Turkey", tags={"admin_level": "6"})
 
     # Keep only polygon/multipolygon features with a name
     gdf = gdf[gdf.geometry.geom_type.isin(["Polygon", "MultiPolygon"])].copy()
     gdf = gdf[gdf["name"].notna()].copy()
 
+    # Deduplicate: keep the largest polygon per district name
+    gdf = gdf.copy()
+    gdf["_area"] = gdf.geometry.to_crs("EPSG:32636").area
+    gdf = gdf.sort_values("_area", ascending=False).drop_duplicates(subset="name")
+
     result = gdf[["name", "geometry"]].reset_index(drop=True)
-    result.crs  # ensure CRS is set (osmnx always returns EPSG:4326)
     print(f"Fetched {len(result)} districts")
     return result
 

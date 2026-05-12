@@ -32,7 +32,7 @@ def find_nearest(location, gdf, k=1):
     projected['distance_m'] = projected.geometry.distance(point_gdf.geometry.iloc[0])
 
     nearest = projected.nsmallest(k, 'distance_m')
-    return nearest[['name', 'type', 'distance_m']]
+    return nearest[['name', 'facility_type', 'distance_m']]
 
 
 if __name__ == "__main__":
